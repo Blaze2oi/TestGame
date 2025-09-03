@@ -1,6 +1,7 @@
 extends Node2D
 
 @onready var bg = $TextureRect
+@onready var item_counter = $CanvasLayer/ItemCounter
 
 func _ready():
 	bg.texture = preload("res://Assets/Free/Background/Blue.png")
