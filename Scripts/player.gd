@@ -14,7 +14,7 @@ var jump_buffer_timer: float = 0.0
 
 # Collectibles
 var collected_items: Dictionary = {}
-@export var required_items_for_progress: Dictionary = {"Fruit": 5}
+@export var required_items_for_progress: Dictionary = {"Fruit": 15}
 
 signal item_collected(item_id, current_count)
 signal can_progress_level(can_progress)

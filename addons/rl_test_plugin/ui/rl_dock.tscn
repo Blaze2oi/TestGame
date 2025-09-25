@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3]
+
+[node name="RLTestDock" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBox" type="VBoxContainer" parent="."]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 392.0
+margin_bottom = 392.0
+
+[node name="StartButton" type="Button" parent="./VBox"]
+text = "Start Training"
+
+[node name="EvalButton" type="Button" parent="./VBox"]
+margin_top = 6.0
+text = "Run Evaluation"
+
+[node name="StopButton" type="Button" parent="./VBox"]
+margin_top = 6.0
+text = "Stop"
+
+[node name="LogLabel" type="TextEdit" parent="./VBox"]
+margin_top = 6.0
+rect_min_size = Vector2(300, 200)
+read_only = true

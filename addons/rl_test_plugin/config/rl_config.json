@@ -1,0 +1,28 @@
+{
+  "env": {
+	"name": "TestGameEnv",
+	"max_steps": 1000
+  },
+  "sensors": [
+	{
+	  "type": "TransformSensor",
+	  "node_path": "Player",
+	  "properties": [
+		"global_position",
+		"velocity"
+	  ]
+	}
+  ],
+  "actions": {
+	"type": "discrete",
+	"mapping": [
+	  "left",
+	  "right",
+	  "jump"
+	]
+  },
+  "report": {
+	"save_dir": "user://rl_reports",
+	"capture_failures": true
+  }
+}

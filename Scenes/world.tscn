@@ -594,28 +594,28 @@ text = "Items: 0"
 [node name="Apple" type="Node" parent="."]
 
 [node name="Apple" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(396, 471)
+position = Vector2(396, 463)
 
 [node name="Apple2" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(431, 471)
+position = Vector2(434, 464)
 
 [node name="Apple3" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(468, 471)
+position = Vector2(473, 465)
 
 [node name="Apple4" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(507, 471)
+position = Vector2(514, 465)
 
 [node name="Apple5" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(554, 424)
+position = Vector2(574, 415)
 
 [node name="Apple6" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(609, 419)
+position = Vector2(610, 416)
 
 [node name="Apple7" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(651, 419)
+position = Vector2(650, 416)
 
 [node name="Apple8" parent="Apple" instance=ExtResource("5_fo5ed")]
-position = Vector2(691, 419)
+position = Vector2(689, 417)
 
 [node name="Apple9" parent="Apple" instance=ExtResource("5_fo5ed")]
 position = Vector2(912, 487)
@@ -632,6 +632,12 @@ position = Vector2(695, 313)
 [node name="Apple13" parent="Apple" instance=ExtResource("5_fo5ed")]
 position = Vector2(620, 313)
 
+[node name="Apple14" parent="Apple" instance=ExtResource("5_fo5ed")]
+position = Vector2(796, 540)
+
+[node name="Apple15" parent="Apple" instance=ExtResource("5_fo5ed")]
+position = Vector2(744, 353)
+
 [node name="01" type="Sprite2D" parent="."]
 position = Vector2(152.75, 103.25)
 scale = Vector2(1.71053, 1.97059)
@@ -641,7 +647,6 @@ texture = ExtResource("6_5v1tr")
 position = Vector2(508, 296)
 sprite_frames = SubResource("SpriteFrames_b4e6k")
 autoplay = "default"
-frame_progress = 0.249924
 
 [node name="Checkpoint(noFlag)" type="Sprite2D" parent="."]
 position = Vector2(-78, 87)
@@ -660,3 +665,5 @@ texture = ExtResource("9_7yui6")
 [connection signal="collected" from="Apple/Apple11" to="player" method="_on_Collectable_collected"]
 [connection signal="collected" from="Apple/Apple12" to="player" method="_on_Collectable_collected"]
 [connection signal="collected" from="Apple/Apple13" to="player" method="_on_Collectable_collected"]
+[connection signal="collected" from="Apple/Apple14" to="player" method="_on_Collectable_collected"]
+[connection signal="collected" from="Apple/Apple15" to="player" method="_on_Collectable_collected"]
