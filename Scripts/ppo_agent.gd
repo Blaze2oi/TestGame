@@ -17,10 +17,16 @@ const OUTPUT_SIZE = 3  # [left, right, jump]
 @export var batch_size: int = 64
 
 # Reward values - ADJUST THESE FOR DIFFERENT BEHAVIORS
+# NOTE: These are now managed by reward_functions.gd
+# You can still use these for quick testing without changing strategy
 @export var reward_collect_apple: float = 10.0
 @export var reward_move_toward_apple: float = 0.1
 @export var reward_time_penalty: float = -0.01
 @export var reward_death: float = -5.0
+
+# Reward function module
+var reward_module: Node = null
+@export var use_reward_module: bool = true  # Set false to use simple rewards above
 
 # Experience buffer
 var states = []
@@ -40,7 +46,15 @@ var episode_count: int = 0
 
 func _ready():
 	initialize_networks()
-	print("PPO Agent initialized")
+	
+	# Load reward module if enabled
+	if use_reward_module:
+		reward_module = preload("res://Scripts/reward_functions.gd").new()
+		add_child(reward_module)
+		print("PPO Agent initialized with reward strategy: ", reward_module.get_strategy_name())
+	else:
+		print("PPO Agent initialized with simple rewards")
+	
 	print("Input size: ", INPUT_SIZE)
 	print("Output size: ", OUTPUT_SIZE)
 
@@ -148,7 +162,18 @@ func action_to_inputs(action: int) -> Dictionary:
 # REWARD CALCULATION - Define what's good/bad
 # ============================================
 func calculate_reward(player: CharacterBody2D, collected_apple: bool, 
-					  prev_distance: float, curr_distance: float) -> float:
+					  prev_distance: float, curr_distance: float,
+					  prev_velocity: Vector2 = Vector2.ZERO,
+					  highest_y: float = 0.0) -> float:
+	
+	# Use advanced reward module if enabled
+	if use_reward_module and reward_module:
+		return reward_module.calculate_reward(
+			player, collected_apple, prev_distance, curr_distance,
+			prev_velocity, highest_y
+		)
+	
+	# Otherwise use simple reward calculation
 	var reward = 0.0
 	
 	# Big reward for collecting apple

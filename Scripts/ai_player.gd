@@ -6,7 +6,7 @@ extends CharacterBody2D
 @export var gravity: float = 900.0
 @export var coyote_time: float = 0.1
 @export var jump_buffer_time: float = 0.1
-@export var jump_cut_multiplier: float = 0.5
+#@export var jump_cut_multiplier: float = 0.5
 
 var coyote_timer: float = 0.0
 var jump_buffer_timer: float = 0.0
@@ -24,6 +24,8 @@ var step_count: int = 0
 var prev_state: Array = []
 var prev_action: int = 0
 var prev_distance_to_apple: float = 0.0
+var prev_velocity: Vector2 = Vector2.ZERO
+var highest_y_reached: float = 600.0  # Track highest point reached
 
 signal item_collected(item_id, current_count)
 signal can_progress_level(can_progress)
@@ -56,8 +58,16 @@ func _physics_process(delta: float) -> void:
 		# Calculate reward
 		var collected_apple = step_count > 0 and collected_items["Fruit"] > prev_collected_count
 		var curr_distance = _get_nearest_apple_distance(apples)
-		var reward = ppo_agent.calculate_reward(self, collected_apple, 
-												 prev_distance_to_apple, curr_distance)
+		
+		# Update highest point
+		if position.y < highest_y_reached:
+			highest_y_reached = position.y
+		
+		var reward = ppo_agent.calculate_reward(
+			self, collected_apple, 
+			prev_distance_to_apple, curr_distance,
+			prev_velocity, highest_y_reached
+		)
 		
 		# Store experience
 		if step_count > 0:
@@ -77,6 +87,7 @@ func _physics_process(delta: float) -> void:
 		prev_state = current_state
 		prev_action = action
 		prev_distance_to_apple = curr_distance
+		prev_velocity = velocity
 		step_count += 1
 	else:
 		# Manual control (original player code)
@@ -128,8 +139,8 @@ func _apply_movement(inputs: Dictionary, delta: float):
 		jump_buffer_timer = 0
 		coyote_timer = 0
 	
-	if not inputs.get("jump", false) and velocity.y < 0:
-		velocity.y *= jump_cut_multiplier
+	#if not inputs.get("jump", false) and velocity.y < 0:
+		#velocity.y *= jump_cut_multiplier
 
 func _get_all_apples() -> Array:
 	var world = get_tree().current_scene
@@ -157,8 +168,14 @@ func _get_nearest_apple_distance(apples: Array) -> float:
 func _reset_episode():
 	position = Vector2(237, 497)  # Starting position
 	velocity = Vector2.ZERO
+	prev_velocity = Vector2.ZERO
 	prev_collected_count = 0
 	collected_items["Fruit"] = 0
+	highest_y_reached = 600.0
+	
+	# Reset reward module exploration tracking
+	if ppo_agent and ppo_agent.reward_module:
+		ppo_agent.reward_module.reset_exploration()
 	
 	# Update UI
 	var world = get_tree().current_scene
