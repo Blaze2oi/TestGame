@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=4 uid="uid://5bhe1iyf3cdb"]
+[gd_scene load_steps=9 format=4 uid="uid://5bhe1iyf3cdb"]
 
 [ext_resource type="Texture2D" uid="uid://bc0dfny11tos1" path="res://Assets/Free/Background/Blue.png" id="1_a02cp"]
 [ext_resource type="Script" uid="uid://dggequfqvvsp1" path="res://Scripts/world.gd" id="1_go701"]
 [ext_resource type="PackedScene" uid="uid://c16pr4tl2mf8j" path="res://Scenes/player.tscn" id="3_5a7ea"]
 [ext_resource type="Texture2D" uid="uid://cfgv4swi22gcv" path="res://Assets/Free/Terrain/Terrain (16x16).png" id="4_8j60k"]
 [ext_resource type="PackedScene" uid="uid://bygv14ywf60e0" path="res://Scenes/apple.tscn" id="5_fo5ed"]
+[ext_resource type="PackedScene" uid="uid://3iqg0m6jwwhb" path="res://Scenes/ai_player.tscn" id="6_5ukr8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fo5ed"]
 texture = ExtResource("4_8j60k")
@@ -301,7 +302,7 @@ texture = ExtResource("1_a02cp")
 stretch_mode = 1
 
 [node name="player" parent="." instance=ExtResource("3_5a7ea")]
-position = Vector2(237, 497)
+position = Vector2(225, 502)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(575, 325)
@@ -347,6 +348,9 @@ position = Vector2(651, 419)
 
 [node name="Apple8" parent="Apple" instance=ExtResource("5_fo5ed")]
 position = Vector2(691, 419)
+
+[node name="player2" parent="." instance=ExtResource("6_5ukr8")]
+position = Vector2(252, 502)
 
 [connection signal="collected" from="Apple/Apple" to="player" method="_on_Collectable_collected"]
 [connection signal="collected" from="Apple/Apple2" to="player" method="_on_Collectable_collected"]
