@@ -352,6 +352,9 @@ position = Vector2(691, 419)
 [node name="player2" parent="." instance=ExtResource("6_5ukr8")]
 position = Vector2(252, 502)
 
+[node name="player3" parent="." instance=ExtResource("6_5ukr8")]
+position = Vector2(159, 539)
+
 [connection signal="collected" from="Apple/Apple" to="player" method="_on_Collectable_collected"]
 [connection signal="collected" from="Apple/Apple2" to="player" method="_on_Collectable_collected"]
 [connection signal="collected" from="Apple/Apple3" to="player" method="_on_Collectable_collected"]
