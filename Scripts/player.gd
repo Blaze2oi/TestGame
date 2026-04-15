@@ -5,9 +5,9 @@ extends CharacterBody2D
 @export var gravity: float = 900.0
 
 # Jump polish settings
-@export var coyote_time: float = 0.1        # seconds after leaving ground you can still jump
-@export var jump_buffer_time: float = 0.1   # seconds jump input is buffered
-@export var jump_cut_multiplier: float = 0.5 # reduce upward velocity when jump released early
+@export var coyote_time: float = 0.1
+@export var jump_buffer_time: float = 0.1
+@export var jump_cut_multiplier: float = 0.5
 
 var coyote_timer: float = 0.0
 var jump_buffer_timer: float = 0.0
@@ -16,6 +16,7 @@ var jump_buffer_timer: float = 0.0
 var is_ai_driving: bool = true
 var ai_x_input: float = 0.0
 var ai_jump_input: bool = false
+var _ai_jump_prev: bool = false  # FIX: track previous frame to detect release edge
 
 # Collectibles
 var collected_items: Dictionary = {}
@@ -37,22 +38,23 @@ func _physics_process(delta: float) -> void:
 	var current_dir := 0.0
 	var wants_to_jump := false
 	var released_jump := false
-	
-	# --- 1. THE INPUT SWITCH (Moved to the top!) ---
+
+	# --- 1. INPUT SWITCH ---
 	if is_ai_driving:
 		current_dir = ai_x_input
 		wants_to_jump = ai_jump_input
-		released_jump = not ai_jump_input # AI "releases" by sending false
+		# FIX: released_jump should only fire on the falling EDGE (true→false transition),
+		# not every frame ai_jump_input is false (which was causing constant jump cuts).
+		released_jump = _ai_jump_prev and not ai_jump_input
+		_ai_jump_prev = ai_jump_input
 	else:
 		current_dir = Input.get_axis("Left", "Right")
 		wants_to_jump = Input.is_action_just_pressed("Jump")
 		released_jump = Input.is_action_just_released("Jump")
 
 	# --- 2. APPLY MOVEMENT ---
-	# Move left/right using the decided input
 	velocity.x = current_dir * speed
 
-	# Apply gravity
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
@@ -68,11 +70,11 @@ func _physics_process(delta: float) -> void:
 	else:
 		jump_buffer_timer -= delta
 
-	# --- Perform Jump (buffer + coyote) ---
+	# --- PERFORM JUMP ---
 	if jump_buffer_timer > 0 and coyote_timer > 0:
 		velocity.y = jump_velocity
-		jump_buffer_timer = 0   # consume buffer
-		coyote_timer = 0        # consume coyote
+		jump_buffer_timer = 0
+		coyote_timer = 0
 
 	# --- VARIABLE JUMP HEIGHT ---
 	if released_jump and velocity.y < 0:
@@ -82,8 +84,10 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	# Optional: Flip sprite
-	if current_dir != 0 and $AnimatedSprite2D:
-		$AnimatedSprite2D.flip_h = current_dir < 0
+	if current_dir != 0:
+		var sprite := get_node_or_null("AnimatedSprite2D") as AnimatedSprite2D
+		if sprite:
+			sprite.flip_h = current_dir < 0
 
 
 # -------------------------------
@@ -95,23 +99,22 @@ func collect_item(item_id: String, value: int):
 		print("Collected ", value, " of ", item_id, ". Total: ", collected_items[item_id])
 		emit_signal("item_collected", item_id, collected_items[item_id])
 
-		# Update UI counter
-		var world = get_tree().current_scene
-		if world.has_node("CanvasLayer/ItemCounter"):
-			var label = world.get_node("CanvasLayer/ItemCounter") as Label
-			label.text = "Items: " + str(collected_items[item_id])
-		
+		# FIX: Use get_node_or_null for safety instead of assuming the node exists
+		var world := get_tree().current_scene
+		if world:
+			var label := world.get_node_or_null("CanvasLayer/ItemCounter") as Label
+			if label:
+				label.text = "Items: " + str(collected_items[item_id])
+
 		check_level_progress()
 	else:
 		print("Warning: Collected unknown item_id: ", item_id)
 
 func check_level_progress():
-	var all_required_met = true
+	var all_required_met := true
 	for item_id in required_items_for_progress.keys():
-		if collected_items.has(item_id) and collected_items[item_id] < required_items_for_progress[item_id]:
-			all_required_met = false
-			break
-		elif not collected_items.has(item_id):
+		var count: int = collected_items.get(item_id, 0)
+		if count < required_items_for_progress[item_id]:
 			all_required_met = false
 			break
 
