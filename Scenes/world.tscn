@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=4 uid="uid://5bhe1iyf3cdb"]
+[gd_scene load_steps=50 format=4 uid="uid://5bhe1iyf3cdb"]
 
 [ext_resource type="Texture2D" uid="uid://bc0dfny11tos1" path="res://Assets/Free/Background/Blue.png" id="1_a02cp"]
 [ext_resource type="Script" uid="uid://dggequfqvvsp1" path="res://Scripts/world.gd" id="1_go701"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://13jy0f737vr7" path="res://Assets/Free/Items/Checkpoints/Checkpoint/Checkpoint (Flag Out) (64x64).png" id="7_0fj1v"]
 [ext_resource type="Texture2D" uid="uid://c5yo62w485670" path="res://Assets/Free/Items/Checkpoints/Checkpoint/Checkpoint (Flag Idle)(64x64).png" id="8_ikia7"]
 [ext_resource type="Texture2D" uid="uid://c4rm4b2qkja2j" path="res://Assets/Free/Items/Checkpoints/Checkpoint/Checkpoint (No Flag).png" id="9_7yui6"]
+[ext_resource type="Script" uid="uid://c42utjqy5yx30" path="res://addons/godot_rl_agents/sync.gd" id="10_0fj1v"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fo5ed"]
 texture = ExtResource("4_8j60k")
@@ -644,8 +645,12 @@ autoplay = "default"
 frame_progress = 0.249924
 
 [node name="Checkpoint(noFlag)" type="Sprite2D" parent="."]
-position = Vector2(-78, 87)
+position = Vector2(403, 215)
 texture = ExtResource("9_7yui6")
+
+[node name="Sync" type="Node" parent="."]
+script = ExtResource("10_0fj1v")
+metadata/_custom_type_script = "uid://c42utjqy5yx30"
 
 [connection signal="collected" from="Apple/Apple" to="player" method="_on_Collectable_collected"]
 [connection signal="collected" from="Apple/Apple2" to="player" method="_on_Collectable_collected"]

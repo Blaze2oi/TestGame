@@ -1,7 +1,8 @@
-[gd_scene load_steps=16 format=3 uid="uid://c16pr4tl2mf8j"]
+[gd_scene load_steps=17 format=3 uid="uid://c16pr4tl2mf8j"]
 
 [ext_resource type="Script" uid="uid://2x6yecusnp1m" path="res://Scripts/player.gd" id="1_cvnsp"]
 [ext_resource type="Texture2D" uid="uid://csei5awqpuge6" path="res://Assets/Free/Main Characters/Virtual Guy/Idle (32x32).png" id="1_v0iea"]
+[ext_resource type="Script" uid="uid://uwhk286b6pwy" path="res://Scenes/platformer_bug_ai.gd" id="3_6t5aa"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_cvnsp"]
 atlas = ExtResource("1_v0iea")
@@ -101,3 +102,7 @@ autoplay = "default"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, 4)
 shape = SubResource("CapsuleShape2D_7dp3o")
+
+[node name="AIController2D" type="Node2D" parent="."]
+script = ExtResource("3_6t5aa")
+metadata/_custom_type_script = "uid://rmbeifbcobk0"

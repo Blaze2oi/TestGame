@@ -12,6 +12,11 @@ extends CharacterBody2D
 var coyote_timer: float = 0.0
 var jump_buffer_timer: float = 0.0
 
+# --- AI VARIABLES ---
+var is_ai_driving: bool = true
+var ai_x_input: float = 0.0
+var ai_jump_input: bool = false
+
 # Collectibles
 var collected_items: Dictionary = {}
 @export var required_items_for_progress: Dictionary = {"Fruit": 5}
@@ -24,17 +29,28 @@ func _ready():
 		collected_items[item_id] = 0
 	check_level_progress()
 
+func ai_drive(x_input: float, jump_input: bool):
+	ai_x_input = x_input
+	ai_jump_input = jump_input
+
 func _physics_process(delta: float) -> void:
-	var direction = 0
+	var current_dir := 0.0
+	var wants_to_jump := false
+	var released_jump := false
+	
+	# --- 1. THE INPUT SWITCH (Moved to the top!) ---
+	if is_ai_driving:
+		current_dir = ai_x_input
+		wants_to_jump = ai_jump_input
+		released_jump = not ai_jump_input # AI "releases" by sending false
+	else:
+		current_dir = Input.get_axis("Left", "Right")
+		wants_to_jump = Input.is_action_just_pressed("Jump")
+		released_jump = Input.is_action_just_released("Jump")
 
-	# Handle horizontal input
-	if Input.is_action_pressed("Left"):
-		direction -= 1
-	if Input.is_action_pressed("Right"):
-		direction += 1
-
-	# Move left/right
-	velocity.x = direction * speed
+	# --- 2. APPLY MOVEMENT ---
+	# Move left/right using the decided input
+	velocity.x = current_dir * speed
 
 	# Apply gravity
 	if not is_on_floor():
@@ -47,7 +63,7 @@ func _physics_process(delta: float) -> void:
 		coyote_timer -= delta
 
 	# --- JUMP BUFFER ---
-	if Input.is_action_just_pressed("Jump"):
+	if wants_to_jump:
 		jump_buffer_timer = jump_buffer_time
 	else:
 		jump_buffer_timer -= delta
@@ -59,15 +75,15 @@ func _physics_process(delta: float) -> void:
 		coyote_timer = 0        # consume coyote
 
 	# --- VARIABLE JUMP HEIGHT ---
-	if Input.is_action_just_released("Jump") and velocity.y < 0:
+	if released_jump and velocity.y < 0:
 		velocity.y *= jump_cut_multiplier
 
-	# Move the character
+	# --- 3. EXECUTE PHYSICS ---
 	move_and_slide()
 
 	# Optional: Flip sprite
-	if direction != 0 and $AnimatedSprite2D:
-		$AnimatedSprite2D.flip_h = direction < 0
+	if current_dir != 0 and $AnimatedSprite2D:
+		$AnimatedSprite2D.flip_h = current_dir < 0
 
 
 # -------------------------------
@@ -79,7 +95,7 @@ func collect_item(item_id: String, value: int):
 		print("Collected ", value, " of ", item_id, ". Total: ", collected_items[item_id])
 		emit_signal("item_collected", item_id, collected_items[item_id])
 
-		# ✅ Update UI counter
+		# Update UI counter
 		var world = get_tree().current_scene
 		if world.has_node("CanvasLayer/ItemCounter"):
 			var label = world.get_node("CanvasLayer/ItemCounter") as Label

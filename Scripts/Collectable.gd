@@ -1,24 +1,35 @@
 extends Area2D
 
-@export var item_id: String = "Fruit" # Unique identifier for this type of item
-@export var collection_value: int = 1 # How many items this collectable counts as
+@export var item_id: String = "Fruit" 
+@export var collection_value: int = 1 
 
 signal collected(item_id, value)
 
+# --- 1. TRACKING VARIABLE ---
+var has_been_collected: bool = false
+
 func _ready():
-	# Ensure the Area2D has a collision shape
 	if not get_node_or_null("CollisionShape2D"):
 		print("Warning: Collectable item needs a CollisionShape2D child.")
-	# Play the default animation
 	$AnimatedSprite2D.play("default")
 
 func _on_body_entered(body):
-	# Check if the entering body is the player
 	if body.has_method("collect_item"):
-		# Emit the signal to the player
+		
+		# --- 2. THE WATCHDOG TRAP ---
+		# If this is false, the rule passes. If it's true, the Watchdog screams!
+		QAManager.assert_rule(
+			not has_been_collected,
+			"Double Collect Glitch",
+			"The AI managed to collect an apple that was already playing its death animation!",
+			{"apple_id": item_id, "apple_pos": position, "player_velocity": body.velocity}
+		)
+		
+		# Immediately flag it as collected so the rule breaks if touched again
+		has_been_collected = true 
+		
+		# --- 3. YOUR NORMAL LOGIC ---
 		emit_signal("collected", item_id, collection_value)
-		# Play the collected animation
 		$AnimatedSprite2D.play("collected")
-		# Wait for the animation to finish before queue_freeing
 		await $AnimatedSprite2D.animation_finished
-		queue_free() # Remove the collectable from the scene
+		queue_free()
